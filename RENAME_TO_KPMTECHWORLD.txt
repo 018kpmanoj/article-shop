@@ -1,0 +1,70 @@
+================================================================================
+   RENAME NETLIFY SITE TO: kpmtechworld
+================================================================================
+
+I've opened the Netlify site settings page in your browser.
+
+FOLLOW THESE SIMPLE STEPS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: Find "Site details" Section
+------------------------------------
+Scroll down on the page until you see:
+- Site name: animated-pika-7d3575
+
+STEP 2: Click "Change site name" Button
+----------------------------------------
+Click the button next to the current site name.
+
+STEP 3: Enter New Name
+-----------------------
+In the text box, type:
+
+   kpmtechworld
+
+STEP 4: Save Changes
+--------------------
+Click "Save" button.
+
+DONE! ✅
+--------
+Your new URL will be:
+
+   https://kpmtechworld.netlify.app/
+
+The site will be instantly accessible at the new URL!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTE: If the name "kpmtechworld" is already taken, try:
+- kpmtechworld-blog
+- kpm-techworld
+- kpmanoj-techworld
+- kpmtechworld2024
+
+================================================================================
+   AFTER RENAMING
+================================================================================
+
+Your Complete Setup:
+
+Live Site:      https://kpmtechworld.netlify.app/
+GitHub:         https://github.com/018kpmanoj/article-shop
+Account:        018kpmanoj@gmail.com
+
+Share your new URL:
+- LinkedIn
+- Twitter  
+- Email signature
+- Resume
+- GitHub profile
+
+================================================================================
+
+Current URL (old): https://animated-pika-7d3575.netlify.app/
+New URL (after):   https://kpmtechworld.netlify.app/
+
+The old URL will redirect to the new one automatically!
+
+================================================================================
+

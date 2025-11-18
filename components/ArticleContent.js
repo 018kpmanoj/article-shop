@@ -1,7 +1,44 @@
-import { FaClock, FaEye, FaCalendar, FaShare } from 'react-icons/fa'
+'use client'
+
+import { useState } from 'react'
+import { FaClock, FaEye, FaCalendar, FaShare, FaTwitter, FaLinkedin, FaFacebook, FaCopy, FaCheck } from 'react-icons/fa'
 import Newsletter from './Newsletter'
 
 export default function ArticleContent({ article }) {
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const articleUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/articles/${article.slug}`
+    : ''
+
+  const handleShare = (platform) => {
+    const title = encodeURIComponent(article.title)
+    const url = encodeURIComponent(articleUrl)
+    
+    const shareUrls = {
+      twitter: `https://twitter.com/intent/tweet?text=${title}&url=${url}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    }
+
+    if (shareUrls[platform]) {
+      window.open(shareUrls[platform], '_blank', 'width=600,height=400')
+    }
+    setShowShareMenu(false)
+  }
+
+  const copyLink = () => {
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(articleUrl).then(() => {
+        setCopied(true)
+        setTimeout(() => {
+          setCopied(false)
+          setShowShareMenu(false)
+        }, 2000)
+      })
+    }
+  }
   return (
     <div className="bg-white dark:bg-gray-900">
       {/* Hero Section */}
@@ -30,10 +67,59 @@ export default function ArticleContent({ article }) {
               <FaEye />
               <span>{article.views} views</span>
             </div>
-            <button className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-              <FaShare />
-              <span>Share</span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowShareMenu(!showShareMenu)}
+                className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                <FaShare />
+                <span>Share</span>
+              </button>
+
+              {showShareMenu && (
+                <div className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-10 min-w-[200px]">
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => handleShare('twitter')}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      <FaTwitter className="text-blue-400" size={20} />
+                      <span>Twitter</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('linkedin')}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      <FaLinkedin className="text-blue-600" size={20} />
+                      <span>LinkedIn</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('facebook')}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      <FaFacebook className="text-blue-500" size={20} />
+                      <span>Facebook</span>
+                    </button>
+                    <button
+                      onClick={copyLink}
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                    >
+                      {copied ? (
+                        <>
+                          <FaCheck className="text-green-500" size={20} />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy className="text-gray-500" size={20} />
+                          <span>Copy Link</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function Hero() {
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
-                50+
+                26+
               </div>
               <div className="text-gray-600 dark:text-gray-400 mt-2">
                 Articles Published
