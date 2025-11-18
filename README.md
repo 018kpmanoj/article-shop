@@ -212,19 +212,6 @@ NEXT_PUBLIC_GA_ID=your_google_analytics_id
 NEXT_PUBLIC_CMS_API=your_cms_api
 ```
 
-## 🌐 Custom Domain
-
-### On Netlify:
-1. Go to Site Settings → Domain Management
-2. Add custom domain
-3. Follow DNS configuration instructions
-4. SSL is automatic
-
-### Recommended Domain Keywords:
-- kpmanoj.tech
-- kpmanoj.dev
-- techtrends-kpmanoj.com
-- kpmanoj-insights.com
 
 ## 📈 Analytics
 
