@@ -1,12 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaClock, FaEye, FaCalendar, FaShare, FaTwitter, FaLinkedin, FaFacebook, FaCopy, FaCheck } from 'react-icons/fa'
 import Newsletter from './Newsletter'
 
 export default function ArticleContent({ article }) {
   const [showShareMenu, setShowShareMenu] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    // Initialize Mermaid when component mounts
+    if (typeof window !== 'undefined') {
+      import('mermaid').then((mermaid) => {
+        mermaid.default.initialize({
+          startOnLoad: true,
+          theme: 'base',
+          themeVariables: {
+            primaryColor: '#3B82F6',
+            primaryTextColor: '#1F2937',
+            primaryBorderColor: '#2563EB',
+            lineColor: '#6B7280',
+            secondaryColor: '#8B5CF6',
+            tertiaryColor: '#EC4899',
+            background: '#FFFFFF',
+            mainBkg: '#DBEAFE',
+            secondBkg: '#E0E7FF',
+            tertiaryBkg: '#FCE7F3',
+          },
+          fontFamily: 'Inter, system-ui, sans-serif',
+        })
+        
+        // Run mermaid after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          mermaid.default.contentLoaded()
+        }, 100)
+      })
+    }
+  }, [article.slug])
 
   const articleUrl = typeof window !== 'undefined' 
     ? `${window.location.origin}/articles/${article.slug}`
@@ -134,11 +164,39 @@ export default function ArticleContent({ article }) {
 
           {/* Article content */}
           <div className="article-content text-gray-800 dark:text-gray-200">
-            {article.content.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="mb-4 leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
+            {article.content.split('\n\n').map((paragraph, index) => {
+              // Check if paragraph is a heading
+              if (paragraph.startsWith('## ')) {
+                return (
+                  <h2 key={index} className="text-2xl font-semibold mt-8 mb-4 text-gray-900 dark:text-white">
+                    {paragraph.replace('## ', '')}
+                  </h2>
+                )
+              }
+              
+              // Check if paragraph contains Mermaid diagram
+              if (paragraph.includes('```mermaid')) {
+                const mermaidCode = paragraph
+                  .replace(/```mermaid\s*/g, '')
+                  .replace(/```\s*/g, '')
+                  .trim()
+                
+                return (
+                  <div key={index} className="my-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md overflow-x-auto">
+                    <pre className="mermaid text-center">
+                      {mermaidCode}
+                    </pre>
+                  </div>
+                )
+              }
+              
+              // Regular paragraph
+              return (
+                <p key={index} className="mb-4 leading-relaxed">
+                  {paragraph}
+                </p>
+              )
+            })}
           </div>
 
           {/* Tags */}
