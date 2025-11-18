@@ -2,9 +2,41 @@ export const article = {
   slug: 'agent-coordination-patterns',
   title: 'Agent Coordination Patterns for Complex Infrastructure Automation',
   excerpt: 'Master the essential coordination patterns that enable multiple AI agents to automate complex infrastructure tasks without human intervention.',
-  content: `Infrastructure automation at scale demands sophisticated coordination between multiple autonomous agents. Understanding and implementing proven coordination patterns is essential for building reliable, self-managing systems.
+  content: `Infrastructure automation at scale demands sophisticated coordination between multiple autonomous agents. Understanding and implementing **proven coordination patterns** is essential for building reliable, self-managing systems.
 
-The orchestrator pattern centralizes coordination through a master agent that directs subordinate agents. This approach simplifies reasoning about system state and ensures consistent decision-making. However, the orchestrator can become a bottleneck and single point of failure.
+## Coordination Patterns Overview
+
+\`\`\`mermaid
+graph TB
+    subgraph "Orchestrator Pattern"
+        O[Orchestrator] --> A1[Agent 1]
+        O --> A2[Agent 2]
+        O --> A3[Agent 3]
+    end
+    
+    subgraph "Choreography Pattern"
+        B1[Agent A] <--> B2[Agent B]
+        B2 <--> B3[Agent C]
+        B3 <--> B1
+    end
+    
+    subgraph "Pipeline Pattern"
+        C1[Stage 1] --> C2[Stage 2]
+        C2 --> C3[Stage 3]
+        C3 --> C4[Output]
+    end
+    
+    style O fill:#ff9800
+    style B1 fill:#4caf50
+    style B2 fill:#4caf50
+    style B3 fill:#4caf50
+    style C1 fill:#2196f3
+    style C2 fill:#2196f3
+    style C3 fill:#2196f3
+\`\`\`
+
+
+The **orchestrator pattern** centralizes coordination through a master agent that directs subordinate agents. This approach simplifies reasoning about system state and ensures **consistent decision-making**. However, the orchestrator can become a **bottleneck** and **single point of failure**.
 
 Choreography patterns distribute coordination logic across agents without central control. Each agent understands its role and reacts to events from peers. This decentralized approach improves scalability and resilience but requires careful design to prevent inconsistent states.
 

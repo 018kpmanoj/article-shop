@@ -2,9 +2,38 @@ export const article = {
   slug: 'reliability-patterns-agentic-ai',
   title: 'Reliability Patterns for Agentic AI in Mission-Critical Environments',
   excerpt: 'Master the essential reliability patterns that enable agentic AI systems to operate safely and consistently in mission-critical production environments.',
-  content: `Mission-critical environments demand exceptional reliability from autonomous systems. Implementing proven reliability patterns ensures agentic AI systems meet stringent requirements for uptime, correctness, and safety.
+  content: `Mission-critical environments demand **exceptional reliability** from autonomous systems. Implementing **proven reliability patterns** ensures agentic AI systems meet stringent requirements for **uptime**, **correctness**, and **safety**.
 
-Circuit breaker patterns prevent cascading failures when external dependencies fail. When error rates exceed thresholds, circuit breakers temporarily disable problematic integrations, allowing graceful degradation rather than complete system failure. Automatic recovery attempts resume normal operation when systems stabilize.
+## Reliability Patterns Architecture
+
+\`\`\`mermaid
+graph TD
+    A[Incoming Request] --> B{Circuit Breaker}
+    B -->|Open| C[Fallback Response]
+    B -->|Closed| D[Agent Service]
+    
+    D --> E{Timeout?}
+    E -->|Yes| F[Retry Logic]
+    E -->|No| G[Process Request]
+    
+    F --> H{Max Retries?}
+    H -->|Yes| C
+    H -->|No| D
+    
+    G --> I{Health Check}
+    I -->|Fail| J[Bulkhead Isolation]
+    I -->|Pass| K[Success Response]
+    
+    J --> C
+    
+    style B fill:#ff9800
+    style C fill:#f44336
+    style G fill:#4caf50
+    style K fill:#4caf50
+\`\`\`
+
+
+**Circuit breaker patterns** prevent **cascading failures** when external dependencies fail. When error rates exceed thresholds, circuit breakers temporarily disable problematic integrations, allowing **graceful degradation** rather than complete system failure. **Automatic recovery** attempts resume normal operation when systems stabilize.
 
 Retry patterns with exponential backoff handle transient failures gracefully. Not all errors indicate permanent problems—network blips, temporary overload, or brief resource unavailability often resolve quickly. Intelligent retry logic distinguishes transient from permanent failures, avoiding unnecessary load on struggling systems.
 

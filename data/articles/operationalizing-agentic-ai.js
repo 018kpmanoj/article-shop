@@ -2,9 +2,41 @@ export const article = {
   slug: 'operationalizing-agentic-ai',
   title: 'Operationalizing Agentic AI: Patterns, Pipelines, and Governance',
   excerpt: 'Learn the operational patterns, deployment pipelines, and governance frameworks necessary for running agentic AI systems in production environments.',
-  content: `Moving agentic AI from proof-of-concept to production operations requires robust patterns, automated pipelines, and comprehensive governance frameworks. Operational excellence determines long-term success.
+  content: `Moving agentic AI from **proof-of-concept** to **production operations** requires robust patterns, automated pipelines, and comprehensive governance frameworks. **Operational excellence** determines long-term success.
 
-Deployment pipelines for agents differ from traditional software. Models require versioning, A/B testing, and gradual rollouts. Canary deployments test new agent versions with small traffic percentages before full release. Blue-green deployments enable instant rollback if issues arise.
+## MLOps Pipeline for Agents
+
+\`\`\`mermaid
+graph TD
+    A[Code Repository] --> B[CI/CD Pipeline]
+    C[Model Registry] --> B
+    D[Training Data] --> E[Model Training]
+    
+    E --> C
+    
+    B --> F{Tests Pass?}
+    F -->|No| G[Alert Team]
+    F -->|Yes| H[Staging Deploy]
+    
+    H --> I[Integration Tests]
+    I -->|Pass| J[Production Deploy]
+    I -->|Fail| G
+    
+    J --> K[Monitoring]
+    K --> L[Metrics & Logs]
+    L --> M{Performance OK?}
+    
+    M -->|No| N[Rollback]
+    M -->|Yes| O[Continue]
+    
+    style E fill:#9c27b0
+    style J fill:#4caf50
+    style K fill:#ff9800
+    style N fill:#f44336
+\`\`\`
+
+
+**Deployment pipelines** for agents differ from traditional software. Models require **versioning**, **A/B testing**, and **gradual rollouts**. **Canary deployments** test new agent versions with small traffic percentages before full release. **Blue-green deployments** enable instant rollback if issues arise.
 
 Continuous training pipelines keep agents current as domains evolve. Automated data collection, model retraining, and validation ensure agents maintain effectiveness. Drift detection alerts teams when performance degrades.
 

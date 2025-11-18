@@ -2,9 +2,35 @@ export const article = {
   slug: 'agentic-ai-anti-patterns',
   title: 'Agentic AI Anti-Patterns: What Fails at Scale and How to Fix It',
   excerpt: 'Learn from common mistakes in agentic AI implementation and discover proven solutions to anti-patterns that cause failures at scale.',
-  content: `Building agentic AI systems is challenging, and common anti-patterns repeatedly cause problems at scale. Understanding these patterns and their solutions prevents costly mistakes and accelerates successful deployment.
+  content: `Building agentic AI systems is challenging, and **common anti-patterns** repeatedly cause problems at scale. Understanding these patterns and their solutions prevents **costly mistakes** and accelerates successful deployment.
 
-The God Agent anti-pattern creates monolithic agents that attempt to handle all tasks. These agents become unmanageably complex, difficult to maintain, and impossible to scale. Solution: Decompose into specialized agents with clear responsibilities and well-defined interfaces.
+## Common Anti-Patterns to Avoid
+
+\`\`\`mermaid
+graph LR
+    A[Anti-Patterns] --> B[God Agent]
+    A --> C[Chatty Agent]
+    A --> D[No Fallback]
+    A --> E[Blind Trust]
+    
+    B --> F[Solution: Decompose]
+    C --> G[Solution: Batch & Cache]
+    D --> H[Solution: Graceful Degradation]
+    E --> I[Solution: Validation Layer]
+    
+    style A fill:#f44336
+    style B fill:#ff9800
+    style C fill:#ff9800
+    style D fill:#ff9800
+    style E fill:#ff9800
+    style F fill:#4caf50
+    style G fill:#4caf50
+    style H fill:#4caf50
+    style I fill:#4caf50
+\`\`\`
+
+
+The **God Agent anti-pattern** creates monolithic agents that attempt to handle all tasks. These agents become **unmanageably complex**, difficult to maintain, and impossible to scale. **Solution**: Decompose into **specialized agents** with **clear responsibilities** and **well-defined interfaces**.
 
 The Chatty Agent anti-pattern involves excessive communication between agents. Each interaction adds latency and increases failure modes. Solution: Implement batch operations, caching, and asynchronous messaging. Design agents for autonomy rather than constant coordination.
 

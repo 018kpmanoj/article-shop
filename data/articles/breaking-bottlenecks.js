@@ -2,9 +2,34 @@ export const article = {
   slug: 'breaking-bottlenecks',
   title: 'Breaking the Bottlenecks: Practical Scalability Patterns for Agentic Systems',
   excerpt: 'Identify and eliminate common performance bottlenecks in agentic AI systems with proven patterns and optimization strategies.',
-  content: `Performance bottlenecks plague even well-designed agentic systems as they scale. Understanding common bottleneck patterns and proven mitigation strategies is essential for maintaining responsiveness and efficiency.
+  content: `Performance bottlenecks plague even well-designed agentic systems as they scale. Understanding **common bottleneck patterns** and proven mitigation strategies is essential for maintaining **responsiveness** and **efficiency**.
 
-Model inference latency often becomes the primary bottleneck. Each agent decision requires model evaluation, and sequential processing severely limits throughput. Implementing batch inference, model caching, and speculative execution dramatically improves performance.
+## Performance Optimization Flow
+
+\`\`\`mermaid
+graph TD
+    A[Identify Bottleneck] --> B{Type?}
+    B -->|Model Inference| C[Batch Processing]
+    B -->|State Management| D[Caching Layer]
+    B -->|Communication| E[Message Aggregation]
+    B -->|Resource Contention| F[Priority Queues]
+    
+    C --> G[Measure Impact]
+    D --> G
+    E --> G
+    F --> G
+    
+    G --> H{Performance OK?}
+    H -->|No| A
+    H -->|Yes| I[Monitor & Maintain]
+    
+    style A fill:#f44336
+    style G fill:#ff9800
+    style I fill:#4caf50
+\`\`\`
+
+
+**Model inference latency** often becomes the primary bottleneck. Each agent decision requires model evaluation, and **sequential processing** severely limits throughput. Implementing **batch inference**, **model caching**, and **speculative execution** dramatically improves performance.
 
 State management overhead grows as systems track more agents and their interactions. Distributed state stores, eventual consistency models, and strategic denormalization balance consistency requirements with performance needs.
 

@@ -190,10 +190,21 @@ export default function ArticleContent({ article }) {
                 )
               }
               
-              // Regular paragraph
+              // Regular paragraph - process bold text
+              const processedParagraph = paragraph.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return (
+                    <strong key={i} className="font-semibold text-blue-600 dark:text-blue-400">
+                      {part.slice(2, -2)}
+                    </strong>
+                  )
+                }
+                return part
+              })
+              
               return (
                 <p key={index} className="mb-4 leading-relaxed">
-                  {paragraph}
+                  {processedParagraph}
                 </p>
               )
             })}
