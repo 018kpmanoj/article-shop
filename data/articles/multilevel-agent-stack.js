@@ -4,6 +4,32 @@ export const article = {
   excerpt: 'Explore the architectural layers that enable autonomous agents to reason, plan complex tasks, and execute actions in dynamic environments.',
   content: `The evolution from reactive to truly intelligent agents requires a sophisticated multilevel stack that mirrors human cognitive processes. This architecture enables agents to move beyond simple stimulus-response patterns to genuine autonomous behavior.
 
+## Multilevel Agent Stack Architecture
+
+\`\`\`mermaid
+graph TD
+    A[Meta-Cognitive Layer] --> B[Reasoning Layer]
+    B --> C[Planning Layer]
+    C --> D[Action Layer]
+    D --> E[Perception Layer]
+    
+    F[Memory Systems] --> B
+    F --> C
+    F --> D
+    
+    E --> G[Environment]
+    D --> G
+    G --> E
+    
+    style A fill:#e1bee7
+    style B fill:#ce93d8
+    style C fill:#ba68c8
+    style D fill:#ab47bc
+    style E fill:#9c27b0
+    style F fill:#ffeb3b
+\`\`\`
+
+
 At the foundation lies the perception layer, where agents process and interpret environmental inputs. This layer integrates multiple data sources, applies semantic understanding, and builds a coherent world model that agents can reason about.
 
 The reasoning layer implements higher-order cognitive functions. Here, agents employ various reasoning strategies—logical inference, causal reasoning, analogical thinking—to understand complex situations and derive insights. Integration with knowledge graphs and domain ontologies enriches this capability.

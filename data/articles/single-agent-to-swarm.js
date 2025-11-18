@@ -4,6 +4,36 @@ export const article = {
   excerpt: 'Discover how transitioning from individual agents to coordinated swarms unlocks new levels of scalability, resilience, and collective intelligence.',
   content: `The journey from single-agent systems to swarm intelligence represents a paradigm shift in how we architect autonomous AI systems. Swarm approaches offer emergent capabilities that exceed the sum of individual agent contributions.
 
+## Swarm Intelligence Architecture
+
+\`\`\`mermaid
+graph LR
+    subgraph "Swarm System"
+        A1[Agent 1] <--> MSG[Message Bus]
+        A2[Agent 2] <--> MSG
+        A3[Agent 3] <--> MSG
+        A4[Agent N] <--> MSG
+    end
+    
+    MSG <--> COORD[Coordinator]
+    COORD --> STATE[Shared State]
+    
+    A1 --> TASK[Task Queue]
+    A2 --> TASK
+    A3 --> TASK
+    A4 --> TASK
+    
+    TASK --> OUTPUT[Results]
+    
+    style A1 fill:#4caf50
+    style A2 fill:#4caf50
+    style A3 fill:#4caf50
+    style A4 fill:#4caf50
+    style MSG fill:#2196f3
+    style COORD fill:#ff9800
+\`\`\`
+
+
 Individual agents excel at focused tasks but struggle with complex, multifaceted challenges requiring diverse expertise. Swarm architectures enable specialization where different agents master specific domains while collaborating toward common goals.
 
 Communication protocols form the backbone of swarm systems. Agents exchange information about their state, discoveries, and intentions. Message-passing architectures, publish-subscribe patterns, and shared memory models each offer distinct trade-offs in latency, consistency, and scalability.

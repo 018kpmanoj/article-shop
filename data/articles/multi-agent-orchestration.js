@@ -4,6 +4,35 @@ export const article = {
   excerpt: 'Discover how orchestrating multiple specialized agents enables organizations to scale AI capabilities across departments while maintaining coherence and control.',
   content: `Scaling AI intelligence across an organization requires more than deploying individual agents. Effective multi-agent orchestration coordinates specialized agents to deliver cohesive outcomes while respecting organizational boundaries and workflows.
 
+## Multi-Agent Orchestration Flow
+
+\`\`\`mermaid
+sequenceDiagram
+    participant U as User
+    participant O as Orchestrator
+    participant A1 as Agent 1
+    participant A2 as Agent 2
+    participant A3 as Agent 3
+    participant D as Data Store
+    
+    U->>O: Submit Task
+    O->>O: Analyze & Plan
+    O->>A1: Assign Subtask 1
+    O->>A2: Assign Subtask 2
+    
+    A1->>D: Query Data
+    D-->>A1: Return Data
+    A1-->>O: Complete Subtask 1
+    
+    A2->>A3: Delegate to Specialist
+    A3-->>A2: Return Result
+    A2-->>O: Complete Subtask 2
+    
+    O->>O: Aggregate Results
+    O-->>U: Final Response
+\`\`\`
+
+
 The orchestration challenge grows with organizational complexity. Different departments have unique requirements, data access levels, and processes. A unified orchestration layer enables coordination without forcing standardization that undermines specialized needs.
 
 Hierarchical orchestration mirrors organizational structures. Executive agents coordinate department-level agents, which manage team-level specialized agents. This hierarchy enables both high-level strategic direction and detailed tactical execution.

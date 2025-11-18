@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
+    "mermaid": "^11.12.1",
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.11.0"
+    "react-icons": "^4.11.0",
+    "react-mermaid2": "^0.1.4"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
