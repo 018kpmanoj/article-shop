@@ -1,27 +1,59 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEnvelope, FaCheckCircle } from 'react-icons/fa'
+import { FaEnvelope, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa'
+import { subscribeToNewsletter } from '@/lib/newsletter'
+import { trackActivity } from '@/lib/activityTracker'
 
 export default function Newsletter() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle, loading, success, error
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setStatus('loading')
+    setErrorMessage('')
 
-    // Simulate API call (replace with actual newsletter service integration)
-    setTimeout(() => {
-      console.log('Newsletter subscription:', email)
-      setStatus('success')
-      setEmail('')
+    // Validate email
+    if (!email || !email.includes('@')) {
+      setStatus('error')
+      setErrorMessage('Please enter a valid email address')
+      return
+    }
+
+    try {
+      const result = await subscribeToNewsletter(email)
       
-      // Reset after 3 seconds
+      if (result.success) {
+        setStatus('success')
+        trackActivity('newsletter_subscription', { email })
+        setEmail('')
+        
+        // Reset after 5 seconds
+        setTimeout(() => {
+          setStatus('idle')
+        }, 5000)
+      } else {
+        setStatus('error')
+        setErrorMessage(result.error || 'Failed to subscribe. Please try again.')
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          setStatus('idle')
+          setErrorMessage('')
+        }, 3000)
+      }
+    } catch (error) {
+      console.error('Newsletter error:', error)
+      setStatus('error')
+      setErrorMessage('An error occurred. Please try again.')
+      
       setTimeout(() => {
         setStatus('idle')
+        setErrorMessage('')
       }, 3000)
-    }, 1000)
+    }
   }
 
   return (
@@ -34,18 +66,18 @@ export default function Newsletter() {
           </h2>
           <p className="text-xl text-blue-100">
             Get the latest articles on AI, technology trends, and business innovation 
-            delivered directly to your inbox. No spam, unsubscribe anytime.
+            delivered directly to your inbox every Sunday. No spam, unsubscribe anytime.
           </p>
         </div>
 
         {status === 'success' ? (
-          <div className="bg-white rounded-lg p-8 text-center">
+          <div className="bg-white rounded-lg p-8 text-center max-w-2xl mx-auto">
             <FaCheckCircle className="text-5xl text-green-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               Thank You for Subscribing!
             </h3>
             <p className="text-gray-600">
-              Check your email to confirm your subscription.
+              You'll receive our weekly newsletter every Sunday with the latest articles and insights.
             </p>
           </div>
         ) : (
@@ -67,8 +99,16 @@ export default function Newsletter() {
                 {status === 'loading' ? 'Subscribing...' : 'Subscribe Now'}
               </button>
             </div>
+            
+            {status === 'error' && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg flex items-center gap-2">
+                <FaExclamationCircle />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+            
             <p className="text-blue-100 text-sm mt-4 text-center">
-              Join 500+ subscribers already getting weekly insights
+              📅 Weekly newsletter sent every Sunday • 🔒 No spam, ever
             </p>
           </form>
         )}
@@ -78,7 +118,7 @@ export default function Newsletter() {
           <div className="text-center text-white">
             <div className="text-3xl font-bold mb-2">📧</div>
             <h3 className="font-semibold mb-1">Weekly Updates</h3>
-            <p className="text-blue-100 text-sm">New articles every week</p>
+            <p className="text-blue-100 text-sm">New articles every Sunday</p>
           </div>
           <div className="text-center text-white">
             <div className="text-3xl font-bold mb-2">🎯</div>
@@ -88,11 +128,10 @@ export default function Newsletter() {
           <div className="text-center text-white">
             <div className="text-3xl font-bold mb-2">🔒</div>
             <h3 className="font-semibold mb-1">Privacy First</h3>
-            <p className="text-blue-100 text-sm">No spam, ever</p>
+            <p className="text-blue-100 text-sm">Unsubscribe anytime</p>
           </div>
         </div>
       </div>
     </section>
   )
 }
-
