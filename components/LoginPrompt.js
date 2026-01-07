@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import LoginModal from './LoginModal';
-import { FaUserCircle, FaSignOutAlt, FaCog, FaChartLine } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt, FaChartLine, FaUserPlus } from 'react-icons/fa';
 import Link from 'next/link';
 
 // Time before showing login prompt (20 seconds)
