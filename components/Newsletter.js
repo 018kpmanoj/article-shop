@@ -12,9 +12,11 @@ export default function Newsletter() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!email || !email.includes('@')) {
+    const trimmedEmail = email.trim().toLowerCase()
+    if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.includes('.')) {
       setStatus('error')
       setMessage('Please enter a valid email address')
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000)
       return
     }
 
@@ -22,19 +24,22 @@ export default function Newsletter() {
     setMessage('Subscribing...')
 
     try {
-      const result = await subscribeToNewsletter(email)
+      console.log('Calling subscribeToNewsletter...')
+      const result = await subscribeToNewsletter(trimmedEmail)
+      console.log('Subscription result:', result)
       
       if (result.success) {
         setStatus('success')
-        setMessage('🎉 Successfully subscribed! Check your inbox.')
+        setMessage('🎉 Successfully subscribed!')
         setEmail('')
         setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000)
       } else {
         setStatus('error')
         setMessage(result.error || 'Failed to subscribe')
-        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000)
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 4000)
       }
     } catch (error) {
+      console.error('Subscribe error:', error)
       setStatus('error')
       setMessage('Connection error. Please try again.')
       setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000)
@@ -51,12 +56,12 @@ export default function Newsletter() {
           </h2>
           <p className="text-xl text-blue-100">
             Get the latest articles on AI, technology trends, and business innovation 
-            delivered directly to your inbox every Sunday. No spam, unsubscribe anytime.
+            delivered directly to your inbox every Sunday.
           </p>
         </div>
 
         {status === 'success' ? (
-          <div className="bg-white rounded-lg p-8 text-center max-w-2xl mx-auto animate-pulse">
+          <div className="bg-white rounded-lg p-8 text-center max-w-2xl mx-auto">
             <FaCheckCircle className="text-5xl text-green-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               Thank You for Subscribing!
@@ -78,12 +83,12 @@ export default function Newsletter() {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50 whitespace-nowrap flex items-center justify-center gap-2"
+                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-70 whitespace-nowrap flex items-center justify-center gap-2 min-w-[160px]"
               >
                 {status === 'loading' ? (
                   <>
                     <FaSpinner className="animate-spin" />
-                    Subscribing...
+                    <span>Please wait...</span>
                   </>
                 ) : (
                   'Subscribe Now'
@@ -93,9 +98,9 @@ export default function Newsletter() {
             
             {/* Status Message */}
             {message && status !== 'success' && (
-              <div className={`mt-4 p-3 rounded-lg flex items-center gap-2 ${
-                status === 'error' ? 'bg-red-100 text-red-700' : 
-                status === 'loading' ? 'bg-blue-100 text-blue-700' : ''
+              <div className={`mt-4 p-3 rounded-lg flex items-center justify-center gap-2 ${
+                status === 'error' ? 'bg-red-500 text-white' : 
+                status === 'loading' ? 'bg-white/20 text-white' : ''
               }`}>
                 {status === 'error' && <FaExclamationCircle />}
                 {status === 'loading' && <FaSpinner className="animate-spin" />}
@@ -104,7 +109,7 @@ export default function Newsletter() {
             )}
             
             <p className="text-blue-100 text-sm mt-4 text-center">
-              📅 Weekly newsletter sent every Sunday • 🔒 No spam, ever
+              📅 Weekly newsletter every Sunday • 🔒 No spam, unsubscribe anytime
             </p>
           </form>
         )}

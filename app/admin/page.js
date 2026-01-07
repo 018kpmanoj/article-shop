@@ -43,7 +43,6 @@ export default function AdminDashboard() {
     
     setIsLoading(true);
     try {
-      // Parallel fetch for better performance
       const [loginStats, pageStats, recentActivities, subCount, subsList] = await Promise.all([
         getLoginStats(dateRange),
         getPageViewStats(dateRange),
@@ -52,7 +51,6 @@ export default function AdminDashboard() {
         getSubscribers()
       ]);
       
-      // Fetch users separately (might not exist yet)
       let usersData = [];
       if (db) {
         try {
@@ -64,7 +62,7 @@ export default function AdminDashboard() {
             lastLogin: doc.data().lastLogin?.toDate?.() || new Date(),
             createdAt: doc.data().createdAt?.toDate?.() || new Date()
           }));
-        } catch (e) { /* Users collection may not exist */ }
+        } catch (e) { console.log('Users fetch error:', e); }
       }
 
       setStats({
@@ -82,7 +80,7 @@ export default function AdminDashboard() {
       setUsers(usersData);
       setSubscribers(subsList || []);
     } catch (error) {
-      console.error('Error fetching dashboard:', error);
+      console.error('Dashboard error:', error);
     }
     setIsLoading(false);
   }, [dateRange]);
@@ -93,7 +91,7 @@ export default function AdminDashboard() {
 
   const handleSendTestEmail = async () => {
     setSendingNewsletter(true);
-    setNewsletterStatus('Sending test email...');
+    setNewsletterStatus('Sending test email to 018kpmanoj@gmail.com...');
     try {
       const result = await sendNewsletterEmail('018kpmanoj@gmail.com');
       setNewsletterStatus(result.success ? '✅ Test email sent!' : `❌ ${result.message || result.error}`);
@@ -270,8 +268,9 @@ export default function AdminDashboard() {
                   {newsletterStatus}
                 </div>
               )}
-              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-700 dark:text-yellow-400">
-                <strong>Setup:</strong> Add RESEND_API_KEY to Netlify environment variables. Get free API key at resend.com
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-400">
+                <strong>Email Setup:</strong> Add <code>RESEND_API_KEY</code> to Netlify → Site Settings → Environment Variables. 
+                Get free key at <a href="https://resend.com" target="_blank" rel="noopener" className="underline">resend.com</a>
               </div>
             </Card>
             <Card title={`Subscribers (${subscribers.length})`}>
@@ -285,7 +284,12 @@ export default function AdminDashboard() {
                     <span className="text-xs text-gray-400">{sub.subscribedAt?.toLocaleDateString?.()}</span>
                   </div>
                 ))}
-                {subscribers.length === 0 && <p className="p-4 text-center text-gray-500">No subscribers yet</p>}
+                {subscribers.length === 0 && (
+                  <div className="p-4 text-center">
+                    <p className="text-gray-500 mb-2">No subscribers yet</p>
+                    <p className="text-sm text-gray-400">Make sure Firestore rules allow writes. Go to Firebase Console → Firestore → Rules</p>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
