@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getActivities, getLoginStats, getPageViewStats } from '@/lib/activityTracker';
+import { getSubscribers, getSubscriberCount, generateNewsletterContent, sendNewsletterEmail } from '@/lib/newsletter';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { articles } from '@/data';
 import { 
   FaUsers, FaChartLine, FaShieldAlt, FaEye, FaSignInAlt, 
   FaGoogle, FaEnvelope, FaGlobe, FaClock, FaExclamationTriangle,
-  FaArrowUp, FaArrowDown, FaFilter, FaDownload, FaSync
+  FaArrowUp, FaArrowDown, FaSync, FaPaperPlane, FaNewspaper,
+  FaUserCheck, FaCalendarAlt, FaBell
 } from 'react-icons/fa';
 
 export default function AdminDashboard() {
@@ -23,13 +26,17 @@ export default function AdminDashboard() {
     emailLogins: 0,
     uniqueUsers: 0,
     totalPageViews: 0,
-    uniqueSessions: 0
+    uniqueSessions: 0,
+    subscriberCount: 0
   });
   const [activities, setActivities] = useState([]);
   const [users, setUsers] = useState([]);
+  const [subscribers, setSubscribers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [dateRange, setDateRange] = useState(7);
+  const [sendingNewsletter, setSendingNewsletter] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -57,16 +64,29 @@ export default function AdminDashboard() {
       // Fetch recent activities
       const recentActivities = await getActivities(100);
       
+      // Fetch subscriber count
+      const subCount = await getSubscriberCount();
+      
+      // Fetch subscribers list
+      const subsList = await getSubscribers();
+      
       // Fetch users
-      const usersSnapshot = await getDocs(
-        query(collection(db, 'users'), orderBy('lastLogin', 'desc'), limit(50))
-      );
-      const usersData = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        lastLogin: doc.data().lastLogin?.toDate?.() || new Date(),
-        createdAt: doc.data().createdAt?.toDate?.() || new Date()
-      }));
+      let usersData = [];
+      if (db) {
+        try {
+          const usersSnapshot = await getDocs(
+            query(collection(db, 'users'), orderBy('lastLogin', 'desc'), limit(50))
+          );
+          usersData = usersSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            lastLogin: doc.data().lastLogin?.toDate?.() || new Date(),
+            createdAt: doc.data().createdAt?.toDate?.() || new Date()
+          }));
+        } catch (e) {
+          console.log('Users collection may not exist yet');
+        }
+      }
 
       setStats({
         totalLogins: loginStats.totalLogins,
@@ -76,14 +96,81 @@ export default function AdminDashboard() {
         uniqueUsers: loginStats.uniqueUsers,
         totalPageViews: pageStats.totalViews,
         uniqueSessions: pageStats.uniqueSessions,
-        pageBreakdown: pageStats.pageBreakdown
+        pageBreakdown: pageStats.pageBreakdown,
+        subscriberCount: subCount
       });
       setActivities(recentActivities);
       setUsers(usersData);
+      setSubscribers(subsList);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
     setIsLoading(false);
+  };
+
+  const handleSendNewsletter = async () => {
+    if (subscribers.length === 0) {
+      setNewsletterStatus('No subscribers to send to!');
+      return;
+    }
+
+    setSendingNewsletter(true);
+    setNewsletterStatus('Sending newsletter...');
+
+    try {
+      // Get latest articles
+      const latestArticles = articles.slice(0, 5);
+      const content = generateNewsletterContent(latestArticles, true);
+      
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const subscriber of subscribers) {
+        const result = await sendNewsletterEmail(
+          subscriber.email,
+          '🚀 Weekly Tech Trends from K P Manoj',
+          content
+        );
+        
+        if (result.success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      }
+
+      setNewsletterStatus(`Newsletter sent! ✅ ${successCount} success, ❌ ${failCount} failed`);
+    } catch (error) {
+      setNewsletterStatus('Error sending newsletter: ' + error.message);
+    }
+    
+    setSendingNewsletter(false);
+  };
+
+  const handleSendTestEmail = async () => {
+    setSendingNewsletter(true);
+    setNewsletterStatus('Sending test email to admin...');
+
+    try {
+      const latestArticles = articles.slice(0, 5);
+      const content = generateNewsletterContent(latestArticles, true);
+      
+      const result = await sendNewsletterEmail(
+        '018kpmanoj@gmail.com',
+        '🧪 TEST: Weekly Tech Trends from K P Manoj',
+        content
+      );
+      
+      if (result.success) {
+        setNewsletterStatus('✅ Test email sent to 018kpmanoj@gmail.com!');
+      } else {
+        setNewsletterStatus('❌ Failed to send test email: ' + result.error);
+      }
+    } catch (error) {
+      setNewsletterStatus('Error: ' + error.message);
+    }
+    
+    setSendingNewsletter(false);
   };
 
   if (loading) {
@@ -95,7 +182,15 @@ export default function AdminDashboard() {
   }
 
   if (!isAdmin) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <FaShieldAlt className="text-6xl text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h1>
+          <p className="text-gray-600 dark:text-gray-400">You don't have permission to view this page.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -109,7 +204,7 @@ export default function AdminDashboard() {
                 <FaShieldAlt /> Admin Dashboard
               </h1>
               <p className="text-blue-100 mt-1">
-                Monitor user activity, logins, and website interactions
+                Welcome, {user?.displayName || user?.email} • Monitor your website
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -146,8 +241,8 @@ export default function AdminDashboard() {
           />
           <StatCard
             icon={<FaUsers />}
-            label="Total Signups"
-            value={stats.totalSignups}
+            label="Registered Users"
+            value={users.length}
             color="green"
           />
           <StatCard
@@ -157,91 +252,20 @@ export default function AdminDashboard() {
             color="purple"
           />
           <StatCard
-            icon={<FaGlobe />}
-            label="Unique Sessions"
-            value={stats.uniqueSessions}
+            icon={<FaNewspaper />}
+            label="Subscribers"
+            value={stats.subscriberCount}
             color="orange"
           />
         </div>
 
-        {/* Login Method Breakdown */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <FaChartLine className="text-blue-500" /> Login Methods
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                    <FaGoogle className="text-red-500" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300">Google</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {stats.googleLogins}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    ({stats.totalLogins > 0 ? Math.round((stats.googleLogins / stats.totalLogins) * 100) : 0}%)
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                    <FaEnvelope className="text-blue-500" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300">Email</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {stats.emailLogins}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    ({stats.totalLogins > 0 ? Math.round((stats.emailLogins / stats.totalLogins) * 100) : 0}%)
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Top Pages */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <FaEye className="text-purple-500" /> Top Pages
-            </h2>
-            <div className="space-y-3">
-              {stats.pageBreakdown && Object.entries(stats.pageBreakdown)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([path, count]) => (
-                  <div key={path} className="flex items-center justify-between">
-                    <span className="text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
-                      {path === '/' ? 'Home' : path}
-                    </span>
-                    <span className="text-gray-900 dark:text-white font-semibold">
-                      {count} views
-                    </span>
-                  </div>
-                ))
-              }
-              {(!stats.pageBreakdown || Object.keys(stats.pageBreakdown).length === 0) && (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  No page view data yet
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
-          {['overview', 'users', 'activities', 'security'].map((tab) => (
+        <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+          {['overview', 'users', 'activities', 'newsletter', 'security'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-3 font-medium capitalize transition-colors ${
+              className={`px-4 py-3 font-medium capitalize transition-colors whitespace-nowrap ${
                 activeTab === tab
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -252,10 +276,124 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Tab Content */}
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Login Methods */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <FaChartLine className="text-blue-500" /> Login Methods
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                      <FaGoogle className="text-red-500" />
+                    </div>
+                    <span className="text-gray-700 dark:text-gray-300">Google</span>
+                  </div>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.googleLogins}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <FaEnvelope className="text-blue-500" />
+                    </div>
+                    <span className="text-gray-700 dark:text-gray-300">Email</span>
+                  </div>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.emailLogins}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Pages */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <FaEye className="text-purple-500" /> Top Pages
+              </h2>
+              <div className="space-y-3">
+                {stats.pageBreakdown && Object.entries(stats.pageBreakdown)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 5)
+                  .map(([path, count]) => (
+                    <div key={path} className="flex items-center justify-between">
+                      <span className="text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
+                        {path === '/' ? 'Home' : path}
+                      </span>
+                      <span className="text-gray-900 dark:text-white font-semibold">
+                        {count} views
+                      </span>
+                    </div>
+                  ))
+                }
+                {(!stats.pageBreakdown || Object.keys(stats.pageBreakdown).length === 0) && (
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                    No page view data yet
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Quick Overview
+              </h2>
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+                  <p className="text-sm text-blue-600 dark:text-blue-400">Total Unique Users</p>
+                  <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.uniqueUsers}</p>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg">
+                  <p className="text-sm text-green-600 dark:text-green-400">Unique Sessions</p>
+                  <p className="text-3xl font-bold text-green-700 dark:text-green-300">{stats.uniqueSessions}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Users */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Recent Users
+              </h2>
+              <div className="space-y-3">
+                {users.slice(0, 5).map((u) => (
+                  <div key={u.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg">
+                    {u.photoURL ? (
+                      <img src={u.photoURL} alt="" className="w-10 h-10 rounded-full" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                        {(u.email?.[0] || 'U').toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white truncate">
+                        {u.displayName || u.email?.split('@')[0]}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                        {u.email}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {users.length === 0 && (
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                    No users yet
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
         {activeTab === 'users' && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Registered Users ({users.length})
               </h2>
@@ -268,40 +406,29 @@ export default function AdminDashboard() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Logins</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Last Login</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Joined</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                  {users.map((u) => (
+                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          {user.photoURL ? (
-                            <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                          {u.photoURL ? (
+                            <img src={u.photoURL} alt="" className="w-8 h-8 rounded-full" />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-                              {(user.email?.[0] || 'U').toUpperCase()}
+                              {(u.email?.[0] || 'U').toUpperCase()}
                             </div>
                           )}
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {user.displayName || 'Anonymous'}
-                            </p>
-                            {user.isAdmin && (
-                              <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full">
-                                Admin
-                              </span>
-                            )}
-                          </div>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {u.displayName || 'Anonymous'}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{user.email}</td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{user.loginCount || 1}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{u.email}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{u.loginCount || 1}</td>
                       <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
-                        {user.lastLogin?.toLocaleDateString?.() || 'N/A'}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
-                        {user.createdAt?.toLocaleDateString?.() || 'N/A'}
+                        {u.lastLogin?.toLocaleDateString?.() || 'N/A'}
                       </td>
                     </tr>
                   ))}
@@ -316,11 +443,12 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Activities Tab */}
         {activeTab === 'activities' && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Recent Activities
+                Recent Activities ({activities.length})
               </h2>
             </div>
             <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[600px] overflow-y-auto">
@@ -357,62 +485,85 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === 'overview' && (
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Quick Stats */}
+        {/* Newsletter Tab */}
+        {activeTab === 'newsletter' && (
+          <div className="space-y-6">
+            {/* Newsletter Actions */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Quick Overview
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <FaPaperPlane className="text-blue-500" /> Send Newsletter
               </h2>
-              <div className="space-y-4">
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
-                  <p className="text-sm text-blue-600 dark:text-blue-400">Total Unique Users</p>
-                  <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.uniqueUsers}</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Send the weekly newsletter with the latest articles to all subscribers.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={handleSendTestEmail}
+                  disabled={sendingNewsletter}
+                  className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  <FaBell /> Send Test Email
+                </button>
+                <button
+                  onClick={handleSendNewsletter}
+                  disabled={sendingNewsletter || subscribers.length === 0}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  <FaPaperPlane /> Send to All ({subscribers.length} subscribers)
+                </button>
+              </div>
+              {newsletterStatus && (
+                <div className={`mt-4 p-3 rounded-lg ${newsletterStatus.includes('✅') ? 'bg-green-100 text-green-700' : newsletterStatus.includes('❌') ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                  {newsletterStatus}
                 </div>
-                <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg">
-                  <p className="text-sm text-green-600 dark:text-green-400">Conversion Rate</p>
-                  <p className="text-3xl font-bold text-green-700 dark:text-green-300">
-                    {stats.uniqueSessions > 0 ? Math.round((stats.totalSignups / stats.uniqueSessions) * 100) : 0}%
-                  </p>
-                </div>
+              )}
+              <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                  <strong>Note:</strong> To enable email sending, set up EmailJS credentials in your environment variables:
+                  <br />• NEXT_PUBLIC_EMAILJS_SERVICE_ID
+                  <br />• NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+                  <br />• NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+                </p>
               </div>
             </div>
 
-            {/* Recent Signups */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Recent Users
-              </h2>
-              <div className="space-y-3">
-                {users.slice(0, 5).map((user) => (
-                  <div key={user.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg">
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="" className="w-10 h-10 rounded-full" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
-                        {(user.email?.[0] || 'U').toUpperCase()}
+            {/* Subscribers List */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Newsletter Subscribers ({subscribers.length})
+                </h2>
+              </div>
+              <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+                {subscribers.map((sub) => (
+                  <div key={sub.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                        <FaEnvelope className="text-blue-500" />
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">
-                        {user.displayName || user.email?.split('@')[0]}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {user.email}
-                      </p>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{sub.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Subscribed: {sub.subscribedAt?.toLocaleDateString?.() || 'N/A'}
+                        </p>
+                      </div>
                     </div>
+                    <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">
+                      Active
+                    </span>
                   </div>
                 ))}
-                {users.length === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                    No users yet
-                  </p>
+                {subscribers.length === 0 && (
+                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                    No subscribers yet. Share your newsletter to get started!
+                  </div>
                 )}
               </div>
             </div>
           </div>
         )}
 
+        {/* Security Tab */}
         {activeTab === 'security' && (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -456,7 +607,7 @@ export default function AdminDashboard() {
               }
               {activities.filter(a => a.action?.includes('failed')).length === 0 && (
                 <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  No failed login attempts
+                  No failed login attempts 🎉
                 </p>
               )}
             </div>
@@ -467,7 +618,7 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ icon, label, value, color, trend }) {
+function StatCard({ icon, label, value, color }) {
   const colors = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
@@ -482,12 +633,6 @@ function StatCard({ icon, label, value, color, trend }) {
         <div className={`p-3 rounded-xl ${colors[color]} text-white`}>
           {icon}
         </div>
-        {trend && (
-          <span className={`flex items-center gap-1 text-sm ${trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {trend > 0 ? <FaArrowUp /> : <FaArrowDown />}
-            {Math.abs(trend)}%
-          </span>
-        )}
       </div>
       <p className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
       <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
@@ -504,6 +649,7 @@ function getActivityBadgeColor(action) {
     logout: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
     page_view: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
     article_read: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+    newsletter_subscription: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
     login_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
     google_login_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
     signup_failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
