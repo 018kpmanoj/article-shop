@@ -10,7 +10,7 @@ export default function Footer() {
           {/* About */}
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              KP Manoj Tech Trends
+              K P Manoj Tech Trends
             </h3>
             <p className="text-gray-400 mb-4">
               Exploring the intersection of AI, technology, and business innovation. 
@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>© {currentYear} KP Manoj. All rights reserved. Built with Next.js & Tailwind CSS</p>
+          <p>© {currentYear} K P Manoj. All rights reserved. Built with Next.js & Tailwind CSS</p>
         </div>
       </div>
     </footer>

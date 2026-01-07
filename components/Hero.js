@@ -13,7 +13,7 @@ export default function Hero() {
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Insights on artificial intelligence, technology trends, and business innovation 
-            by KP Manoj, AI Software Engineer
+            by K P Manoj, AI Software Engineer
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

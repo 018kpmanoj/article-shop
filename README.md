@@ -1,4 +1,4 @@
-# KP Manoj Tech Trends - Article Platform
+# K P Manoj Tech Trends - Article Platform
 
 A modern, performant blog platform for sharing insights on AI, technology trends, and business innovation.
 
@@ -313,5 +313,5 @@ npm audit fix       # Fix security vulnerabilities
 
 ---
 
-Built with ❤️ by KP Manoj | Powered by Next.js & Netlify
+Built with ❤️ by K P Manoj | Powered by Next.js & Netlify
 

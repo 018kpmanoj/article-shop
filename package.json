@@ -1,7 +1,7 @@
 {
   "name": "kpmanoj-tech-trends",
   "version": "1.1.0",
-  "description": "Tech & AI Articles by KP Manoj - Business & Technology Trends",
+  "description": "Tech & AI Articles by K P Manoj - Business & Technology Trends",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
