@@ -1,30 +1,35 @@
+import Link from 'next/link'
 import { FaFire, FaRobot, FaChartLine, FaCloud, FaCode } from 'react-icons/fa'
 
 export default function TrendingTopics() {
   const topics = [
     {
-      name: 'Generative AI',
+      name: 'Artificial Intelligence',
       icon: FaRobot,
       count: 12,
       color: 'from-purple-500 to-pink-500',
+      href: '/articles',
     },
     {
-      name: 'Business Trends',
+      name: 'Business Innovation',
       icon: FaChartLine,
-      count: 18,
+      count: 6,
       color: 'from-blue-500 to-cyan-500',
+      href: '/articles',
     },
     {
       name: 'Cloud Computing',
       icon: FaCloud,
-      count: 10,
+      count: 4,
       color: 'from-green-500 to-teal-500',
+      href: '/articles',
     },
     {
-      name: 'Software Engineering',
+      name: 'Software Architecture',
       icon: FaCode,
-      count: 15,
+      count: 5,
       color: 'from-orange-500 to-red-500',
+      href: '/articles',
     },
   ]
 
@@ -45,11 +50,12 @@ export default function TrendingTopics() {
           {topics.map((topic) => {
             const Icon = topic.icon
             return (
-              <div
+              <Link
                 key={topic.name}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-all p-6 cursor-pointer group"
+                href={topic.href}
+                className="bg-white dark:bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 p-6 cursor-pointer group block card-hover"
               >
-                <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${topic.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${topic.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="text-3xl text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -58,7 +64,7 @@ export default function TrendingTopics() {
                 <p className="text-gray-600 dark:text-gray-400">
                   {topic.count} articles
                 </p>
-              </div>
+              </Link>
             )
           })}
         </div>

@@ -24,10 +24,11 @@ Implementation typically proceeds tier by tier. Starting with pilot programs in 
 
 Change management addresses cultural and organizational concerns at each tier. Executive sponsors communicate vision and benefits. Department leaders champion adoption. Team managers support their people through transition. Success stories and visible wins accelerate acceptance.`,
   category: 'Enterprise AI',
-  date: 'Nov 9, 2024',
+  date: 'Nov 9, 2025',
   readTime: '12 min read',
   views: '2.4K',
   featured: false,
   tags: ['Multi-Tier Systems', 'Enterprise AI', 'Organizational Design', 'Agentic AI', 'Governance'],
 }
+
 

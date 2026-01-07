@@ -1,4 +1,5 @@
 // Import all article files
+import { article as biggestAITechRace } from './articles/biggest-ai-tech-race'
 import { article as scalingAgenticAI } from './articles/scaling-agentic-ai-architecture'
 import { article as multilevelAgentStack } from './articles/multilevel-agent-stack'
 import { article as enterpriseScaleAgenticAI } from './articles/enterprise-scale-agentic-ai'
@@ -166,6 +167,7 @@ The key is understanding that architecture should serve your business goals, not
 
 // Combine all articles
 export const allArticles = [
+  biggestAITechRace,
   scalingAgenticAI,
   multilevelAgentStack,
   enterpriseScaleAgenticAI,

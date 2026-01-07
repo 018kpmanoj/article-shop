@@ -60,10 +60,11 @@ Integration patterns coordinate these layers effectively. Event-driven architect
 
 Practical implementation requires careful engineering. State management across layers, performance optimization, and failure handling demand attention. Starting with simpler architectures and progressively adding sophistication often yields better results than attempting full complexity initially.`,
   category: 'Agentic AI',
-  date: 'Nov 10, 2024',
+  date: 'Nov 10, 2025',
   readTime: '14 min read',
   views: '3.0K',
   featured: false,
   tags: ['Cognitive Architecture', 'Memory Systems', 'Tool Use', 'Agentic AI', 'AI Design'],
 }
+
 

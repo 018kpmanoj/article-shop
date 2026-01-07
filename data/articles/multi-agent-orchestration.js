@@ -51,10 +51,11 @@ Governance in multi-agent systems enforces organizational policies. Approval wor
 
 Practical implementation often starts with pilot programs in specific departments before expanding organization-wide. Early successes demonstrate value and inform best practices for broader deployment.`,
   category: 'Agentic AI',
-  date: 'Nov 13, 2024',
+  date: 'Nov 13, 2025',
   readTime: '12 min read',
   views: '2.5K',
   featured: false,
   tags: ['Multi-Agent Systems', 'Orchestration', 'Enterprise AI', 'Agentic AI', 'Workflow Automation'],
 }
+
 

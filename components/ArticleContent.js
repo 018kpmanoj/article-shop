@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { FaClock, FaEye, FaCalendar, FaShare, FaTwitter, FaLinkedin, FaFacebook, FaCopy, FaCheck } from 'react-icons/fa'
 import Newsletter from './Newsletter'
+import ArticleRating from './ArticleRating'
 
 export default function ArticleContent({ article }) {
   const [showShareMenu, setShowShareMenu] = useState(false)
@@ -166,11 +167,42 @@ export default function ArticleContent({ article }) {
           <div className="article-content text-gray-800 dark:text-gray-200">
             {article.content.split('\n\n').map((paragraph, index) => {
               // Check if paragraph is a heading
+              if (paragraph.startsWith('### ')) {
+                return (
+                  <h3 key={index} className="text-xl font-semibold mt-6 mb-3 text-gray-900 dark:text-white">
+                    {paragraph.replace('### ', '')}
+                  </h3>
+                )
+              }
+              
               if (paragraph.startsWith('## ')) {
                 return (
                   <h2 key={index} className="text-2xl font-semibold mt-8 mb-4 text-gray-900 dark:text-white">
                     {paragraph.replace('## ', '')}
                   </h2>
+                )
+              }
+              
+              // Check for markdown image
+              const imageMatch = paragraph.match(/!\[(.*?)\]\((.*?)\)/)
+              if (imageMatch) {
+                const altText = imageMatch[1]
+                const imageSrc = imageMatch[2]
+                const caption = paragraph.split('\n').find(line => line.startsWith('*') && !line.startsWith('**'))
+                
+                return (
+                  <div key={index} className="my-8">
+                    <img 
+                      src={imageSrc} 
+                      alt={altText}
+                      className="w-full rounded-lg shadow-lg"
+                    />
+                    {caption && (
+                      <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2 italic">
+                        {caption.replace(/^\*/, '').replace(/\*$/, '')}
+                      </p>
+                    )}
+                  </div>
                 )
               }
               
@@ -190,22 +222,44 @@ export default function ArticleContent({ article }) {
                 )
               }
               
-              // Regular paragraph - process bold text
-              const processedParagraph = paragraph.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                  return (
-                    <strong key={i} className="font-semibold text-blue-600 dark:text-blue-400">
-                      {part.slice(2, -2)}
-                    </strong>
-                  )
-                }
-                return part
-              })
+              // Check for bullet points
+              if (paragraph.startsWith('- ') || paragraph.startsWith('• ')) {
+                const items = paragraph.split('\n').filter(line => line.trim())
+                return (
+                  <ul key={index} className="list-disc list-inside mb-4 space-y-2">
+                    {items.map((item, i) => (
+                      <li key={i} className="leading-relaxed">
+                        {item.replace(/^[-•]\s*/, '')}
+                      </li>
+                    ))}
+                  </ul>
+                )
+              }
+              
+              // Regular paragraph - process bold text and line breaks
+              const lines = paragraph.split('\n').filter(line => line.trim())
               
               return (
-                <p key={index} className="mb-4 leading-relaxed">
-                  {processedParagraph}
-                </p>
+                <div key={index} className="mb-4">
+                  {lines.map((line, lineIndex) => {
+                    const processedLine = line.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        return (
+                          <strong key={i} className="font-semibold text-blue-600 dark:text-blue-400">
+                            {part.slice(2, -2)}
+                          </strong>
+                        )
+                      }
+                      return part
+                    })
+                    
+                    return (
+                      <p key={lineIndex} className="leading-relaxed mb-2">
+                        {processedLine}
+                      </p>
+                    )
+                  })}
+                </div>
               )
             })}
           </div>
@@ -228,6 +282,9 @@ export default function ArticleContent({ article }) {
               </div>
             </div>
           )}
+          
+          {/* Article Rating */}
+          <ArticleRating articleSlug={article.slug} />
         </div>
       </article>
 

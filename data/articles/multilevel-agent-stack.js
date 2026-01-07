@@ -44,10 +44,11 @@ The meta-cognitive layer provides self-awareness and adaptation. Agents monitor 
 
 Integration patterns ensure seamless information flow between layers while maintaining modularity. Event-driven architectures and message passing protocols enable loose coupling and independent evolution of components.`,
   category: 'Agentic AI',
-  date: 'Nov 18, 2024',
+  date: 'Nov 18, 2025',
   readTime: '14 min read',
   views: '2.8K',
   featured: true,
   tags: ['Agentic AI', 'Cognitive Architecture', 'Planning', 'Reasoning', 'AI Systems'],
 }
+
 

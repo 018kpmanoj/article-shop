@@ -20,10 +20,11 @@ Practical applications demonstrate multimodal reasoning's value. Document unders
 
 Implementation challenges include computational costs, latency requirements, and model complexity. Strategic use of smaller specialized models for initial processing, with larger models for complex reasoning, balances capability and efficiency.`,
   category: 'Agentic AI',
-  date: 'Nov 15, 2024',
+  date: 'Nov 15, 2025',
   readTime: '12 min read',
   views: '2.7K',
   featured: false,
   tags: ['Multimodal AI', 'Reasoning', 'Agentic AI', 'Cross-Modal Learning', 'AI Architecture'],
 }
+
 

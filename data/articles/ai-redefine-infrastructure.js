@@ -24,10 +24,11 @@ The transition to agent-driven infrastructure requires culture change. Operation
 
 Practical deployment starts with low-risk operations in non-production environments. As confidence grows, agent authority expands to more critical systems and complex actions. Comprehensive logging and approval workflows maintain control during transition.`,
   category: 'Infrastructure',
-  date: 'Nov 11, 2024',
+  date: 'Nov 11, 2025',
   readTime: '11 min read',
   views: '2.6K',
   featured: false,
   tags: ['Infrastructure', 'DevOps', 'Agentic AI', 'Automation', 'SRE'],
 }
+
 

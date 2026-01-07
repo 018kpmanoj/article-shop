@@ -22,10 +22,11 @@ Scalability bottlenecks emerge unexpectedly as usage grows. What worked fine in 
 
 Maintenance burden increases as agent systems proliferate. Each agent requires monitoring, updating, and occasional debugging. Companies implementing effective MLOps practices manage complexity through automation, standardization, and dedicated platform teams.`,
   category: 'Agentic AI',
-  date: 'Nov 13, 2024',
+  date: 'Nov 13, 2025',
   readTime: '10 min read',
   views: '3.1K',
   featured: false,
   tags: ['Case Studies', 'Agentic AI', 'Implementation', 'Enterprise', 'Real-World AI'],
 }
+
 

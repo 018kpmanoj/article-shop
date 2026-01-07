@@ -52,10 +52,11 @@ The Static Agents anti-pattern assumes agent capabilities remain constant. As en
 
 Recognition and remediation of these anti-patterns requires vigilance. Code reviews, architecture reviews, and regular system assessments identify problems early. Learning from others' mistakes accelerates progress toward robust, scalable agent systems.`,
   category: 'Agentic AI',
-  date: 'Nov 9, 2024',
+  date: 'Nov 9, 2025',
   readTime: '11 min read',
   views: '2.9K',
   featured: false,
   tags: ['Anti-Patterns', 'Best Practices', 'Agentic AI', 'System Design', 'Lessons Learned'],
 }
+
 

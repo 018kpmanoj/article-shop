@@ -22,10 +22,11 @@ Cost and latency optimization becomes crucial with multiple models. Implementing
 
 Practical deployment requires infrastructure supporting heterogeneous model serving. Container orchestration, GPU scheduling, and model versioning infrastructure enables reliable multi-model operations. Monitoring tracks performance, costs, and accuracy across all models.`,
   category: 'Agentic AI',
-  date: 'Nov 12, 2024',
+  date: 'Nov 12, 2025',
   readTime: '11 min read',
   views: '2.7K',
   featured: false,
   tags: ['Multi-Modal AI', 'LLMs', 'Computer Vision', 'Speech Processing', 'Model Orchestration'],
 }
+
 

@@ -48,10 +48,11 @@ Monitoring and observability at enterprise scale requires sophisticated tooling.
 
 Cost management becomes critical at scale. Implementing metering, resource quotas, and intelligent caching strategies controls expenses while maintaining performance. Regular optimization reviews identify opportunities for efficiency improvements.`,
   category: 'Agentic AI',
-  date: 'Nov 17, 2024',
+  date: 'Nov 17, 2025',
   readTime: '11 min read',
   views: '3.5K',
   featured: false,
   tags: ['Enterprise AI', 'Agentic AI', 'Deployment', 'Governance', 'Security'],
 }
+
 

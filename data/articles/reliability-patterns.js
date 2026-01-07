@@ -53,10 +53,11 @@ Comprehensive monitoring tracks reliability metrics—error rates, latency distr
 
 Testing reliability requires specialized approaches. Load testing validates performance under stress, soak testing reveals memory leaks and resource exhaustion, and chaos testing confirms failure handling. Automated testing incorporates reliability scenarios alongside functional tests.`,
   category: 'Agentic AI',
-  date: 'Nov 12, 2024',
+  date: 'Nov 12, 2025',
   readTime: '13 min read',
   views: '2.3K',
   featured: false,
   tags: ['Reliability', 'Mission-Critical', 'Agentic AI', 'System Design', 'Fault Tolerance'],
 }
+
 

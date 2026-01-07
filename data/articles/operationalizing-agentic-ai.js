@@ -54,10 +54,11 @@ Documentation and runbooks help teams operate systems reliably. Architecture dia
 
 Continuous improvement processes refine operations over time. Postmortems analyze incidents without blame. Retrospectives identify process improvements. Metrics dashboards show trends and progress toward operational goals.`,
   category: 'AI Operations',
-  date: 'Nov 14, 2024',
+  date: 'Nov 14, 2025',
   readTime: '13 min read',
   views: '2.6K',
   featured: false,
   tags: ['MLOps', 'Agentic AI', 'Governance', 'DevOps', 'Production AI'],
 }
+
 

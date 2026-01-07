@@ -26,8 +26,10 @@ export default function FeaturedArticles() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredArticles.map((article) => (
-            <ArticleCard key={article.slug} article={article} featured />
+          {featuredArticles.map((article, index) => (
+            <div key={article.slug} className={`scroll-reveal stagger-${Math.min(index + 1, 5)}`}>
+              <ArticleCard article={article} featured />
+            </div>
           ))}
         </div>
       </div>

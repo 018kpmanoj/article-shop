@@ -47,10 +47,11 @@ Monitoring infrastructure itself can become a bottleneck. Implementing sampling,
 
 Optimization strategies include profiling agent workflows, identifying critical paths, and targeting the highest-impact improvements. Incremental refinement based on production metrics yields better results than premature optimization.`,
   category: 'Agentic AI',
-  date: 'Nov 15, 2024',
+  date: 'Nov 15, 2025',
   readTime: '9 min read',
   views: '1.9K',
   featured: false,
   tags: ['Performance', 'Scalability', 'Agentic AI', 'Optimization', 'System Design'],
 }
+
 

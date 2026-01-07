@@ -1,25 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ArticleList from '@/components/ArticleList'
+import SearchBar from '@/components/SearchBar'
 import { getAllArticles, getAllTags, getAllCategories } from '@/lib/articles'
 import { FaFilter, FaTimes, FaTags, FaFolderOpen } from 'react-icons/fa'
 
-export default function ArticlesPage() {
+function ArticlesContent() {
   const allArticles = getAllArticles()
   const allTags = getAllTags()
   const allCategories = getAllCategories()
+  const searchParams = useSearchParams()
   
   const [selectedTags, setSelectedTags] = useState([])
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    const query = searchParams?.get('search')
+    if (query) {
+      setSearchQuery(query)
+    }
+  }, [searchParams])
 
   // Filter articles
   const filteredArticles = allArticles.filter(article => {
     const matchesCategory = selectedCategory === 'All' || article.category === selectedCategory
     const matchesTags = selectedTags.length === 0 || 
       (article.tags && selectedTags.some(tag => article.tags.includes(tag)))
-    return matchesCategory && matchesTags
+    
+    // Search filter
+    const matchesSearch = !searchQuery || 
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (article.tags && article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
+    
+    return matchesCategory && matchesTags && matchesSearch
   })
 
   const toggleTag = (tag) => {
@@ -40,12 +59,20 @@ export default function ArticlesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 scroll-reveal">
             All Articles
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 scroll-reveal stagger-2">
             Explore {filteredArticles.length} of {allArticles.length} articles on technology, AI, and business innovation
           </p>
+          <div className="scroll-reveal stagger-3">
+            <SearchBar />
+          </div>
+          {searchQuery && (
+            <p className="text-gray-600 dark:text-gray-400 mt-4 scroll-reveal stagger-4">
+              Showing results for: <span className="font-semibold text-blue-600 dark:text-blue-400">"{searchQuery}"</span>
+            </p>
+          )}
         </div>
 
         {/* Mobile filter toggle */}
@@ -184,5 +211,17 @@ export default function ArticlesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ArticlesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-gray-600 dark:text-gray-400">Loading articles...</div>
+      </div>
+    }>
+      <ArticlesContent />
+    </Suspense>
   )
 }
