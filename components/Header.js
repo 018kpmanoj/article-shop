@@ -1,11 +1,31 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { FaBars, FaTimes } from 'react-icons/fa'
+import { useState, useEffect } from 'react'
+import { FaBars, FaTimes, FaMoon, FaSun } from 'react-icons/fa'
+import LoginPrompt from './LoginPrompt'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDark, setIsDark] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const savedTheme = localStorage.getItem('theme') || 'light'
+    setIsDark(savedTheme === 'dark')
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = !isDark ? 'dark' : 'light'
+    setIsDark(!isDark)
+    localStorage.setItem('theme', newTheme)
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -20,7 +40,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              KP Manoj
+              K P Manoj
             </span>
             <span className="ml-2 text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
               Tech Trends
@@ -28,31 +48,49 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+                className="text-gray-700 dark:text-gray-300 font-medium nav-link"
               >
                 {item.name}
               </Link>
             ))}
-            <Link
-              href="#newsletter"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
-            >
-              Subscribe
-            </Link>
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <FaSun size={20} className="text-yellow-500" /> : <FaMoon size={20} className="text-gray-700 dark:text-gray-300" />}
+              </button>
+            )}
+            {/* Login/User Menu */}
+            <LoginPrompt />
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-700 dark:text-gray-300"
-          >
-            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-          </button>
+          {/* Mobile menu buttons */}
+          <div className="md:hidden flex items-center gap-3">
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <FaSun size={18} className="text-yellow-500" /> : <FaMoon size={18} />}
+              </button>
+            )}
+            {/* Mobile Login */}
+            <LoginPrompt />
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 dark:text-gray-300"
+            >
+              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -69,13 +107,6 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Link
-                href="#newsletter"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Subscribe
-              </Link>
             </div>
           </div>
         )}
