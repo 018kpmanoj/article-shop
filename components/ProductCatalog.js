@@ -2,26 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { FaBook, FaTshirt, FaMugHot, FaBell, FaUsers, FaArrowRight, FaGift } from 'react-icons/fa'
+import { FaBook, FaUsers, FaArrowRight, FaClock } from 'react-icons/fa'
 import { PRODUCTS, getProductInterestCount } from '@/lib/productCatalog'
-
-const iconMap = {
-  book: FaBook,
-  clothing: FaTshirt,
-  merch: FaMugHot,
-  bundle: FaGift
-}
 
 export default function ProductCatalog() {
   const [interestCounts, setInterestCounts] = useState({})
-  
-  // Show only first 3 products as preview
-  const previewProducts = PRODUCTS.slice(0, 3)
 
   useEffect(() => {
     const loadCounts = async () => {
       const counts = {}
-      for (const product of previewProducts) {
+      for (const product of PRODUCTS) {
         counts[product.id] = await getProductInterestCount(product.id)
       }
       setInterestCounts(counts)
@@ -38,17 +28,16 @@ export default function ProductCatalog() {
             Coming Soon
           </span>
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            My Products
+            My Books
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Books, merchandise, and more. Register your interest to be notified when they launch!
+            In-depth guides to master AI and technology. Sign in to get notified when they launch!
           </p>
         </div>
 
-        {/* Products Preview Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {previewProducts.map((product) => {
-            const Icon = iconMap[product.type] || FaGift
+        {/* Books Grid */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+          {PRODUCTS.map((product) => {
             const interestCount = interestCounts[product.id] || 0
             
             return (
@@ -56,15 +45,15 @@ export default function ProductCatalog() {
                 key={product.id}
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
               >
-                {/* Product Image */}
+                {/* Book Cover */}
                 <div className={`h-40 ${product.bgGradient || 'bg-gradient-to-br from-purple-500 to-indigo-600'} flex items-center justify-center relative`}>
-                  <Icon className="text-5xl text-white/80" />
-                  <span className="absolute top-3 right-3 px-2 py-1 bg-white/20 backdrop-blur rounded-full text-white text-xs font-medium">
-                    Coming Soon
+                  <FaBook className="text-5xl text-white/80" />
+                  <span className="absolute top-3 right-3 px-2 py-1 bg-white/20 backdrop-blur rounded-full text-white text-xs font-medium flex items-center gap-1">
+                    <FaClock className="text-xs" /> Coming Soon
                   </span>
                 </div>
 
-                {/* Product Info */}
+                {/* Book Info */}
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{product.title}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
@@ -72,12 +61,9 @@ export default function ProductCatalog() {
                   </p>
 
                   {/* Interest Count */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                      <FaUsers className="text-purple-500" />
-                      <span><strong>{interestCount}</strong> interested</span>
-                    </div>
-                    <FaBell className="text-purple-500" />
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <FaUsers className="text-purple-500" />
+                    <span><strong>{interestCount}</strong> people interested</span>
                   </div>
                 </div>
               </div>
@@ -94,9 +80,6 @@ export default function ProductCatalog() {
             View All Products & Get Notified
             <FaArrowRight />
           </Link>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-            {PRODUCTS.length} products coming soon
-          </p>
         </div>
       </div>
     </section>

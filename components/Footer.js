@@ -1,7 +1,7 @@
 import { FaLinkedin, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa'
 
 // Last deployment timestamp - Update this when deploying
-const LAST_UPDATED = '2026-01-21T12:30:00+05:30'
+const LAST_UPDATED = '2026-01-21T18:15:00+05:30'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
