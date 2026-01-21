@@ -52,32 +52,40 @@ export default function ProductsPage() {
   const handleNotify = async (productId) => {
     if (!user?.email) return
     
-    setStatus({ ...status, [productId]: 'loading' })
+    setStatus(prev => ({ ...prev, [productId]: 'loading' }))
     
     try {
       const result = await registerProductInterest(productId, user.email, user.displayName || '')
       
       if (result.success) {
-        setStatus({ ...status, [productId]: 'success' })
-        setMessage({ ...message, [productId]: result.message })
-        setUserInterests({ ...userInterests, [productId]: true })
-        setInterestCounts({ 
-          ...interestCounts, 
-          [productId]: (interestCounts[productId] || 0) + 1 
-        })
+        setStatus(prev => ({ ...prev, [productId]: 'success' }))
+        setMessage(prev => ({ ...prev, [productId]: result.message }))
+        setUserInterests(prev => ({ ...prev, [productId]: true }))
+        setInterestCounts(prev => ({ 
+          ...prev, 
+          [productId]: (prev[productId] || 0) + 1 
+        }))
+        setTimeout(() => {
+          setStatus(prev => ({ ...prev, [productId]: 'idle' }))
+          setMessage(prev => ({ ...prev, [productId]: '' }))
+        }, 4000)
       } else {
-        setStatus({ ...status, [productId]: 'error' })
-        setMessage({ ...message, [productId]: result.message })
+        setStatus(prev => ({ ...prev, [productId]: 'error' }))
+        setMessage(prev => ({ ...prev, [productId]: result.message }))
+        setTimeout(() => {
+          setStatus(prev => ({ ...prev, [productId]: 'idle' }))
+          setMessage(prev => ({ ...prev, [productId]: '' }))
+        }, 4000)
       }
     } catch (error) {
-      setStatus({ ...status, [productId]: 'error' })
-      setMessage({ ...message, [productId]: 'Something went wrong' })
+      console.error('Notify error:', error)
+      setStatus(prev => ({ ...prev, [productId]: 'error' }))
+      setMessage(prev => ({ ...prev, [productId]: 'Something went wrong. Please try again.' }))
+      setTimeout(() => {
+        setStatus(prev => ({ ...prev, [productId]: 'idle' }))
+        setMessage(prev => ({ ...prev, [productId]: '' }))
+      }, 4000)
     }
-
-    setTimeout(() => {
-      setStatus({ ...status, [productId]: 'idle' })
-      setMessage({ ...message, [productId]: '' })
-    }, 4000)
   }
 
   return (
