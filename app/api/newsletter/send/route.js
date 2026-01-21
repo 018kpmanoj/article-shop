@@ -49,6 +49,105 @@ const getLatestArticles = () => {
   ];
 };
 
+// Generate Welcome email HTML
+const generateWelcomeEmailHTML = (subscriberEmail) => {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #10b981, #3b82f6); padding: 50px 30px; text-align: center;">
+      <div style="font-size: 60px; margin-bottom: 15px;">🎉</div>
+      <h1 style="color: white; margin: 0 0 10px 0; font-size: 28px;">Welcome to the Community!</h1>
+      <p style="color: #d1fae5; margin: 0; font-size: 16px;">Thank you for subscribing to K P Manoj Tech Trends</p>
+    </div>
+    
+    <!-- Content -->
+    <div style="padding: 35px 30px;">
+      <h2 style="color: #1e293b; margin: 0 0 20px 0; font-size: 22px;">
+        Hi there! 👋
+      </h2>
+      
+      <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 20px 0;">
+        I'm thrilled to have you on board! You've just joined a community of tech enthusiasts who love staying updated on AI, technology trends, and business innovation.
+      </p>
+      
+      <p style="color: #475569; font-size: 16px; line-height: 1.7; margin: 0 0 25px 0;">
+        Here's what you can expect:
+      </p>
+      
+      <div style="margin-bottom: 25px;">
+        <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+          <span style="font-size: 24px; margin-right: 12px;">📧</span>
+          <div>
+            <strong style="color: #1e293b;">Weekly Newsletter</strong>
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Fresh articles delivered every Sunday</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+          <span style="font-size: 24px; margin-right: 12px;">🚀</span>
+          <div>
+            <strong style="color: #1e293b;">Product Launch Updates</strong>
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Be the first to know about new books and merchandise</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start;">
+          <span style="font-size: 24px; margin-right: 12px;">💡</span>
+          <div>
+            <strong style="color: #1e293b;">Exclusive Insights</strong>
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Tech tips and industry insights you won't find elsewhere</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CTA Button -->
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="https://kpmtechworld.netlify.app/articles" 
+           style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 14px 35px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+          Start Reading Articles →
+        </a>
+      </div>
+      
+      <p style="color: #475569; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0; text-align: center;">
+        Questions or feedback? Just reply to this email—I read every message!
+      </p>
+    </div>
+    
+    <!-- Footer -->
+    <div style="padding: 25px 30px; background: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+      <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px; font-weight: 500;">
+        K P Manoj
+      </p>
+      <p style="margin: 0; color: #94a3b8; font-size: 13px;">
+        AI Software Engineer & Tech Writer
+      </p>
+      <div style="margin-top: 15px;">
+        <a href="https://kpmtechworld.netlify.app" style="color: #3b82f6; text-decoration: none; font-size: 13px;">Website</a>
+        <span style="color: #cbd5e1; margin: 0 8px;">•</span>
+        <a href="https://linkedin.com/in/018kpmanoj" style="color: #3b82f6; text-decoration: none; font-size: 13px;">LinkedIn</a>
+        <span style="color: #cbd5e1; margin: 0 8px;">•</span>
+        <a href="https://twitter.com/018kpmanoj" style="color: #3b82f6; text-decoration: none; font-size: 13px;">Twitter</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom spacing -->
+  <div style="padding: 20px; text-align: center;">
+    <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+      © 2026 K P Manoj Tech Trends. All rights reserved.
+    </p>
+  </div>
+</body>
+</html>
+  `;
+};
+
 // Generate HTML email content
 const generateEmailHTML = (articles, subscriberEmail) => {
   const articlesList = (articles || []).map(article => `
@@ -180,7 +279,7 @@ export async function POST(request) {
     const { action, email } = body;
     
     // Validate action
-    const validActions = ['send_test', 'send_all', 'preview'];
+    const validActions = ['send_test', 'send_all', 'preview', 'send_welcome'];
     if (!action || !validActions.includes(action)) {
       return NextResponse.json(
         { success: false, message: 'Invalid action' },
@@ -202,6 +301,26 @@ export async function POST(request) {
     // Get articles safely
     const articles = getLatestArticles();
     
+    if (action === 'send_welcome') {
+      if (!email) {
+        return NextResponse.json({ success: false, message: 'Email required' }, { status: 400 });
+      }
+      
+      const subject = '🎉 Welcome to K P Manoj Tech Trends!';
+      const html = generateWelcomeEmailHTML(email);
+      
+      const result = await sendEmailViaResend(email, subject, html);
+      
+      logSecurityEvent('welcome_email_sent', { ip: clientIP, email, success: result.success });
+      
+      let response = NextResponse.json({
+        success: result.success,
+        message: result.success ? 'Welcome email sent!' : result.error
+      });
+      
+      return addSecurityHeaders(response);
+    }
+
     if (action === 'send_test') {
       const testEmail = email || '018kpmanoj@gmail.com';
       const subject = '🧪 TEST: Weekly Tech Trends from K P Manoj';

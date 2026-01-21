@@ -1,7 +1,19 @@
 import { FaLinkedin, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa'
 
+// Last deployment timestamp - Update this when deploying
+const LAST_UPDATED = '2026-01-21T12:30:00+05:30'
+
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const lastUpdated = new Date(LAST_UPDATED)
+  const formattedDate = lastUpdated.toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  })
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -17,16 +29,16 @@ export default function Footer() {
               Stay updated with the latest insights and trends.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://linkedin.com/in/018kpmanoj" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <FaLinkedin size={24} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://github.com/018kpmanoj" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <FaGithub size={24} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://twitter.com/018kpmanoj" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <FaTwitter size={24} />
               </a>
-              <a href="mailto:contact@kpmanoj.com" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="mailto:018kpmanoj@gmail.com" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <FaEnvelope size={24} />
               </a>
             </div>
@@ -44,6 +56,11 @@ export default function Footer() {
               <li>
                 <a href="/articles" className="text-gray-400 hover:text-white transition-colors">
                   All Articles
+                </a>
+              </li>
+              <li>
+                <a href="/products" className="text-gray-400 hover:text-white transition-colors">
+                  Products
                 </a>
               </li>
               <li>
@@ -89,6 +106,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>© {currentYear} K P Manoj. All rights reserved. Built with Next.js & Tailwind CSS</p>
+          <p className="text-sm mt-2 text-gray-500">Last Updated: {formattedDate}</p>
         </div>
       </div>
     </footer>

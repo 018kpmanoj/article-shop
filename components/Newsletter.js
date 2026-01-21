@@ -30,7 +30,7 @@ export default function Newsletter() {
       
       if (result.success) {
         setStatus('success')
-        setMessage('🎉 Successfully subscribed!')
+        setMessage('🎉 Successfully subscribed! You\'ll receive updates in your inbox.')
         setEmail('')
         setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000)
       } else {
