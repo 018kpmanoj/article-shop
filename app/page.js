@@ -3,6 +3,7 @@ import FeaturedArticles from '@/components/FeaturedArticles'
 import Newsletter from '@/components/Newsletter'
 import TrendingTopics from '@/components/TrendingTopics'
 import SearchBar from '@/components/SearchBar'
+import ProductCatalog from '@/components/ProductCatalog'
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         </div>
       </div>
       <FeaturedArticles />
+      <ProductCatalog />
       <TrendingTopics />
       <Newsletter />
     </div>

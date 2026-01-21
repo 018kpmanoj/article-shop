@@ -7,6 +7,9 @@ const nextConfig = {
   basePath: '',
   trailingSlash: true,
   
+  // Minimize bundle size for better performance
+  swcMinify: true,
+  
   // Security headers
   async headers() {
     return [
@@ -28,6 +31,32 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+          },
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains',
+          },
+        ],
+      },
+      // Rate limit hint for API routes
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'X-RateLimit-Policy',
+            value: '60 requests per minute',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0',
           },
         ],
       },

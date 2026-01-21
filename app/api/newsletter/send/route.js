@@ -1,4 +1,12 @@
 import { NextResponse } from 'next/server';
+import { 
+  checkRateLimit, 
+  validateEmail, 
+  getClientIP, 
+  rateLimitedResponse, 
+  addSecurityHeaders,
+  logSecurityEvent 
+} from '@/lib/serverSecurity';
 
 // Hardcoded articles for newsletter - prevents import issues
 const getLatestArticles = () => {
@@ -158,8 +166,38 @@ const sendEmailViaResend = async (to, subject, htmlContent) => {
 
 export async function POST(request) {
   try {
+    // Get client IP for rate limiting
+    const clientIP = getClientIP(request);
+    
+    // Check rate limit (5 requests per hour for newsletter)
+    const rateCheck = checkRateLimit(clientIP, 'newsletter');
+    if (!rateCheck.allowed) {
+      logSecurityEvent('rate_limit_exceeded', { ip: clientIP, endpoint: 'newsletter' });
+      return rateLimitedResponse(rateCheck.retryAfter);
+    }
+
     const body = await request.json();
     const { action, email } = body;
+    
+    // Validate action
+    const validActions = ['send_test', 'send_all', 'preview'];
+    if (!action || !validActions.includes(action)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid action' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email if provided
+    if (email) {
+      const emailValidation = validateEmail(email);
+      if (!emailValidation.valid) {
+        return NextResponse.json(
+          { success: false, message: emailValidation.error },
+          { status: 400 }
+        );
+      }
+    }
     
     // Get articles safely
     const articles = getLatestArticles();
@@ -171,24 +209,32 @@ export async function POST(request) {
       
       const result = await sendEmailViaResend(testEmail, subject, html);
       
-      return NextResponse.json({
+      // Log the action
+      logSecurityEvent('newsletter_test_sent', { ip: clientIP, email: testEmail, success: result.success });
+      
+      let response = NextResponse.json({
         success: result.success,
         message: result.success ? `Test email sent to ${testEmail}` : result.error
       });
+      
+      return addSecurityHeaders(response);
     }
     
     if (action === 'send_all') {
-      return NextResponse.json({
+      let response = NextResponse.json({
         success: false,
         message: 'Bulk sending requires admin authentication via admin panel.'
       });
+      return addSecurityHeaders(response);
     }
     
-    return NextResponse.json({ success: false, message: 'Invalid action' });
+    let response = NextResponse.json({ success: false, message: 'Invalid action' });
+    return addSecurityHeaders(response);
   } catch (error) {
     console.error('Newsletter API error:', error);
+    logSecurityEvent('newsletter_api_error', { error: error.message });
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: 'An error occurred. Please try again.' },
       { status: 500 }
     );
   }
